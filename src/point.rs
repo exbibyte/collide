@@ -50,7 +50,7 @@ where
     // this shall test for intersection of bounding shapes first before procedding to test intersection using algorithms of higher complexity
     fn get_intersect(&self, other: &dyn Shape<T>) -> (bool, Option<Matrix<T, 4, 1>>) {
         if !self.get_bound().intersect(other.get_bound()) {
-            return (false, None);
+            (false, None)
         } else {
             match other.get_type() {
                 ShapeType::Point => {
@@ -65,9 +65,9 @@ where
                         test &= self.within_vicinity(self._ori[[i, 0]], other_point._ori[[i, 0]]);
                     }
                     if test {
-                        return (true, Some(self._ori));
+                        (true, Some(self._ori))
                     } else {
-                        return (false, None);
+                        (false, None)
                     }
                 }
                 ShapeType::Ray => {
@@ -97,7 +97,7 @@ where
         }
     }
     fn get_support(&self, _v: &Matrix<T, 4, 1>) -> Option<Matrix<T, 4, 1>> {
-        Some(self._ori.clone())
+        Some(self._ori)
     }
 }
 
@@ -109,11 +109,7 @@ where
         self._vicinity = epsilon.abs();
     }
     fn within_vicinity(&self, a: T, b: T) -> bool {
-        if a + self._vicinity >= b && a - self._vicinity <= b {
-            true
-        } else {
-            false
-        }
+        a + self._vicinity >= b && a - self._vicinity <= b
     }
 }
 

@@ -95,7 +95,7 @@ where
             .max_by(|x, y| {
                 if x.1 < y.1 {
                     cmp::Ordering::Less
-                } else if x.1 < y.1 {
+                } else if x.1 > y.1 {
                     cmp::Ordering::Greater
                 } else {
                     cmp::Ordering::Equal
@@ -129,7 +129,7 @@ where
                         return false;
                     }
                 }
-                return true;
+                true
             }
             _ => {
                 unimplemented!();
@@ -141,12 +141,8 @@ where
     }
     fn get_bound_data(&self) -> [T; 32] {
         let mut arr = [T::zero(); 32];
-        for i in 0..3 {
-            arr[i] = self.bound_lower[i];
-        }
-        for i in 0..3 {
-            arr[i + 3] = self.bound_upper[i];
-        }
+        arr[..3].clone_from_slice(&self.bound_lower[..3]);
+        arr[3..6].clone_from_slice(&self.bound_upper[..3]);
         arr
     }
     fn get_union(&mut self, bounds: &[&dyn Bound<T>]) {
@@ -174,11 +170,11 @@ where
                 let b = self.get_bound_data();
                 let b_lower = &b[0..3];
                 let b_upper = &b[3..6];
-                return [
+                [
                     (b_lower[0] + b_upper[0]) / T::from(2.).unwrap(),
                     (b_lower[1] + b_upper[1]) / T::from(2.).unwrap(),
                     (b_lower[2] + b_upper[2]) / T::from(2.).unwrap(),
-                ];
+                ]
             }
             _ => {
                 unimplemented!();

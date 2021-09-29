@@ -1,10 +1,6 @@
-use crate::bound::Bound;
-use crate::bound_aabb::AxisAlignedBBox;
 use crate::point::*;
 use crate::ray::*;
-use crate::shape::*;
 use crate::vicinity::*;
-use core::any::Any;
 use lightmatrix::matrix::*;
 use num_traits::{Float, NumAssign};
 
@@ -20,13 +16,11 @@ where
     //t = (b_off - a_off) / a_dir
     let t = (b_off - a_off) / a_dir;
     if !a.within_vicinity(t[[0, 0]], t[[1, 0]]) || !a.within_vicinity(t[[1, 0]], t[[2, 0]]) {
-        return (false, None);
+        (false, None)
+    } else if t[[0, 0]] >= T::zero() {
+        (true, Some((a_dir * t[[0, 0]]) + a_off))
     } else {
-        if t[[0, 0]] >= T::zero() {
-            return (true, Some((a_dir * t[[0, 0]]) + a_off));
-        } else {
-            //the point is behind the ray origin and direction
-            return (false, None);
-        }
+        //the point is behind the ray origin and direction
+        (false, None)
     }
 }

@@ -181,11 +181,7 @@ where
         self._vicinity = epsilon.abs();
     }
     fn within_vicinity(&self, a: T, b: T) -> bool {
-        if a + self._vicinity > b && a - self._vicinity < b {
-            true
-        } else {
-            false
-        }
+        a + self._vicinity >= b && a - self._vicinity <= b
     }
 }
 
