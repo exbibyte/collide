@@ -7,6 +7,8 @@ use num_traits::{Float, NumAssign};
 use crate::bound_aabb::AxisAlignedBBox;
 use lightmatrix::matrix::*;
 
+use crate::ray_ray_intersect;
+
 #[derive(Debug, Clone)]
 pub struct Ray3<T: NumAssign + Copy + Default + Float> {
     pub _ori: Matrix<T, 4, 1>,
@@ -59,67 +61,13 @@ where
         }
         match other.get_type() {
             ShapeType::Ray => {
-                let other = match other.as_any().downcast_ref::<Self>() {
+                let other_ray: &Ray3<T> = match other.as_any().downcast_ref::<Self>() {
                     Some(b) => b,
                     None => {
                         panic!("cast to Ray3 failed");
                     }
                 };
-
-                let a_dir = self._dir;
-                let b_dir = other._dir;
-
-                let a_off = self._ori;
-                let b_off = other._ori;
-
-                let c = b_dir - a_dir;
-                let v = a_dir.cross(&b_dir);
-
-                let dot_v_c = v.inner(&c);
-                if !self.within_vicinity(dot_v_c, T::zero()) {
-                    //they are not in the same place, so no intersection occurs
-                    return (false, None);
-                }
-                //test for colinearity
-                let d = b_off - a_off;
-                if v.inner(&v) < T::epsilon() {
-                    //lines are parallel
-                    //check triangle area formed by points on ray a and b
-                    let point1 = a_dir;
-                    let point2 = b_off - a_off;
-                    let triangle_area = point1.cross(&point2).norm_l2();
-                    // println!( "triangle area: {}", triangle_area );
-                    if !self.within_vicinity(triangle_area, T::zero()) {
-                        //no overlap
-                        // println!( "parallel but non-overlapping lines" );
-                        return (false, None);
-                    } else {
-                        //lines are colinear
-                        let direction = if d.inner(&a_dir) < T::zero() {
-                            -T::one()
-                        } else {
-                            T::one()
-                        };
-                        let distance = direction * d.norm_l2() / a_dir.norm_l2();
-                        // println!( "colinear lines, distance: {}", distance );
-                        if distance < T::zero() {
-                            //intersection at offset of ray a, so clamp t to 0
-                            return (true, Some(a_off.clone()));
-                        } else {
-                            //intersection at offset of ray b
-                            return (true, Some(self._dir * distance + self._ori));
-                        }
-                    }
-                } else {
-                    //solvable intersection exists
-                    let numerator = d.cross(&b_dir);
-                    let t = numerator.norm_l2() / v.norm_l2();
-                    if t < T::zero() {
-                        return (false, None);
-                    } else {
-                        return (true, Some(self._dir * t + self._ori));
-                    }
-                }
+                ray_ray_intersect::intersect(self, other_ray)
             }
             // ShapeType::Point => {
             //     let other_shape_data = other.get_shape_data();
