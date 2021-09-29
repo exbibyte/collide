@@ -7,7 +7,7 @@ use core::any::Any;
 use lightmatrix::matrix::*;
 use num_traits::{Float, NumAssign};
 
-pub(crate) fn intersect<T>(a: &Ray3<T>, b: &Ray3<T>) -> (bool, Option<Matrix<T, 4, 1>>)
+pub(crate) fn intersect<T>(a: &Ray<T>, b: &Ray<T>) -> (bool, Option<Matrix<T, 4, 1>>)
 where
     T: NumAssign + Copy + Default + Float,
 {
