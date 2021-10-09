@@ -78,14 +78,14 @@ where
                     //see sphere for sphere point intersection
                     other.get_intersect(self)
                 }
-                // ShapeType::Plane => {
-                //     //see plane for plane point intersection
-                //     other.get_intersect(self)
-                // }
-                // ShapeType::Box => {
-                //     //see recbox for box point intersection
-                //     other.get_intersect(self)
-                // }
+                ShapeType::Plane => {
+                    //see plane for plane point intersection
+                    other.get_intersect(self)
+                }
+                ShapeType::Box => {
+                    //see recbox for box point intersection
+                    other.get_intersect(self)
+                }
                 // ShapeType::TriPrism => {
                 //     //see tri prism for intersection
                 //     other.get_intersect(self)
