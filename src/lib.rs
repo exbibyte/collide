@@ -9,6 +9,7 @@ pub mod ray;
 pub mod rect_box;
 pub mod shape;
 pub mod sphere;
+pub mod tri_prism;
 pub mod vicinity;
 
 mod ray_point_intersect;

@@ -86,10 +86,10 @@ where
                     //see recbox for box point intersection
                     other.get_intersect(self)
                 }
-                // ShapeType::TriPrism => {
-                //     //see tri prism for intersection
-                //     other.get_intersect(self)
-                // }
+                ShapeType::TriPrism => {
+                    //see tri prism for intersection
+                    other.get_intersect(self)
+                }
                 _ => {
                     unimplemented!();
                 }

@@ -1,5 +1,6 @@
 use crate::bound::Bound;
 use crate::bound_aabb::AxisAlignedBBox;
+use crate::plane::*;
 use crate::point::*;
 use crate::ray_point_intersect;
 use crate::ray_ray_intersect;
@@ -127,45 +128,44 @@ where
 
                 return (true, Some((a_dir * t) + a_off));
             }
-            // ShapeType::Plane => {
-            //     let other_shape_data = other.get_shape_data();
-            //     let b_off = Matrix::from([[
-            //         other_shape_data[0],
-            //         other_shape_data[1],
-            //         other_shape_data[2]]
-            //     ]));
-            //     let b_nor = Matrix::from([[
-            //         other_shape_data[3],
-            //         other_shape_data[4],
-            //         other_shape_data[5]]
-            //     ]));
-            //     //ray equation: r(t) = r.offset + r.dir * t
-            //     //plane: p(x) = dot(normal, x-p.offset) = 0
-            //     //p(x) = -dot(p.normal, p.offset) + dot(p.normal, x) = 0
-            //     //substitution:
-            //     // p(t) = -dot(p.fofset,p.normal) + dot(p.normal, r.offset + r.dir*t) = 0
-            //     //      = -dot(p.fofset,p.normal) + dot(p.normal, r.offset) + t*dot(p.normal, r.dir) = 0
-            //     //t = ( dot(p.offset, p.normal) - dot(p.normal, r.offset) )/ dot(p.normal, r.dir )
-            //     let constant = b_off.inner(&b_nor);
-            //     let numerator = constant - b_nor.inner(&self._ori);
-            //     let denominator = b_nor.inner(&self._dir);
-            //     if denominator == 0f64 {
-            //         //ray direction is colplaner to the plane
-            //         if constant == self._ori.inner(&b_nor) {
-            //             return (true, Some(self._ori.clone()));
-            //         } else {
-            //             return (false, None);
-            //         }
-            //     } else if denominator > 0f64 {
-            //         //ray direction is not facing plane normal
-            //         return (false, None);
-            //     }
-            //     let t = numerator / denominator;
-            //     if t < 0f64 {
-            //         return (false, None);
-            //     }
-            //     return (true, Some(&(&self._dir * t) + &self._ori));
-            // }
+            ShapeType::Plane => {
+                let other_plane: &Plane<T> = match other.as_any().downcast_ref::<Plane<T>>() {
+                    Some(b) => b,
+                    None => {
+                        panic!("cast to Plane failed");
+                    }
+                };
+
+                let b_off = other_plane._offset;
+                let b_nor = other_plane._normal;
+
+                //ray equation: r(t) = r.offset + r.dir * t
+                //plane: p(x) = dot(normal, x-p.offset) = 0
+                //p(x) = -dot(p.normal, p.offset) + dot(p.normal, x) = 0
+                //substitution:
+                // p(t) = -dot(p.fofset,p.normal) + dot(p.normal, r.offset + r.dir*t) = 0
+                //      = -dot(p.fofset,p.normal) + dot(p.normal, r.offset) + t*dot(p.normal, r.dir) = 0
+                //t = ( dot(p.offset, p.normal) - dot(p.normal, r.offset) )/ dot(p.normal, r.dir )
+                let constant = b_off.inner(&b_nor);
+                let numerator = constant - b_nor.inner(&self._ori);
+                let denominator = b_nor.inner(&self._dir);
+                if denominator == T::zero() {
+                    //ray direction is colplaner to the plane
+                    if constant == self._ori.inner(&b_nor) {
+                        return (true, Some(self._ori.clone()));
+                    } else {
+                        return (false, None);
+                    }
+                } else if denominator > T::zero() {
+                    //ray direction is not facing plane normal
+                    return (false, None);
+                }
+                let t = numerator / denominator;
+                if t < T::zero() {
+                    return (false, None);
+                }
+                return (true, Some((self._dir * t) + self._ori));
+            }
             _ => {
                 unimplemented!();
             }

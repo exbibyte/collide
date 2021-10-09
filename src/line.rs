@@ -96,7 +96,7 @@ where
             return (false, None);
         } else {
             match other.get_type() {
-                // ShapeType::TriPrism => other.get_intersect(self),
+                ShapeType::TriPrism => other.get_intersect(self),
                 _ => {
                     unimplemented!();
                 }
