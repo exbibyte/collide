@@ -1,12 +1,12 @@
 [package]
-name = "graphicsgeometry"
+name = "geom-collide"
 version = "0.0.0"
 license = "MIT"
 authors = ["Bill Liu"]
 description = "lightweight geometry math for grapics"
-documentation = "https://docs.rs/graphicsgeometry"
-homepage = "https://github.com/exbibyte/graphicsgeometry"
-keywords = ["matrix", "graphics"]
+documentation = "https://docs.rs/geom-collide"
+homepage = "https://github.com/exbibyte/collide"
+keywords = ["matrix", "graphics", "geometry", "collision"]
 edition = "2018"
 
 [dependencies]
