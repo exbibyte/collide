@@ -74,10 +74,10 @@ where
                     //see Ray for ray point intersection
                     other.get_intersect(self)
                 }
-                // ShapeType::Sphere => {
-                //     //see sphere for sphere point intersection
-                //     other.get_intersect(self)
-                // }
+                ShapeType::Sphere => {
+                    //see sphere for sphere point intersection
+                    other.get_intersect(self)
+                }
                 // ShapeType::Plane => {
                 //     //see plane for plane point intersection
                 //     other.get_intersect(self)

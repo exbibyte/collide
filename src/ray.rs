@@ -4,6 +4,7 @@ use crate::point::*;
 use crate::ray_point_intersect;
 use crate::ray_ray_intersect;
 use crate::shape::*;
+use crate::sphere::*;
 use crate::vicinity::Vicinity;
 use core::any::Any;
 use lightmatrix::matrix::*;
@@ -78,52 +79,54 @@ where
                 };
                 ray_point_intersect::intersect(self, other_point)
             }
-            // ShapeType::Sphere => {
-            //     let other_shape_data = other.get_shape_data();
-            //     let ref b_off = Matrix::from([[
-            //         other_shape_data[0],
-            //         other_shape_data[1],
-            //         other_shape_data[2]]
-            //     ]));
-            //     let b_r = other_shape_data[3];
+            ShapeType::Sphere => {
+                let other_sphere: &Sphere<T> = match other.as_any().downcast_ref::<Sphere<T>>() {
+                    Some(b) => b,
+                    None => {
+                        panic!("cast to Sphere failed");
+                    }
+                };
 
-            //     let ref a_dir = self._dir;
-            //     let ref a_off = self._ori;
+                let b_off = other_sphere._ori;
+                let b_r = other_sphere._radius;
 
-            //     //sub in the ray equation into sphere equation
-            //     // b := projection of relative offset onto ray direction
-            //     // c := (minimal possible distance between sphere and ray origin )^2
-            //     let relative_offset = a_off - b_off;
-            //     let b = relative_offset.inner(a_dir);
-            //     let c = relative_offset.inner(&relative_offset) - b_r * b_r;
+                let a_dir = self._dir;
+                let a_off = self._ori;
 
-            //     if b > 0f64 && c > 0f64 {
-            //         //ray is outside of the sphere and points away from sphere
-            //         //thus no intersection occurs
-            //         return (false, None);
-            //     }
+                //sub in the ray equation into sphere equation
+                // b := projection of relative offset onto ray direction
+                // c := (minimal possible distance between sphere and ray origin )^2
+                let relative_offset = a_off - b_off;
+                let b = relative_offset.inner(&a_dir);
+                let c = relative_offset.inner(&relative_offset) - b_r * b_r;
 
-            //     let d = b * b - c;
-            //     if d < 0f64 {
-            //         //ray misses sphere
-            //         return (false, None);
-            //     }
+                if b > T::zero() && c > T::zero() {
+                    //ray is outside of the sphere and points away from sphere
+                    //thus no intersection occurs
+                    return (false, None);
+                }
 
-            //     let t1 = -b - d.sqrt();
-            //     let t2 = -b + d.sqrt();
+                let d = b * b - c;
+                if d < T::zero() {
+                    //ray misses sphere
+                    return (false, None);
+                }
 
-            //     let t = if t1 < 0f64 {
-            //         t2
-            //     } else if t2 < 0f64 {
-            //         t1
-            //     } else if t1 < t2 {
-            //         t1
-            //     } else {
-            //         t2
-            //     };
+                let t1 = -b - d.sqrt();
+                let t2 = -b + d.sqrt();
 
-            //     return (true, Some(&(a_dir * t) + a_off));
-            // }
+                let t = if t1 < T::zero() {
+                    t2
+                } else if t2 < T::zero() {
+                    t1
+                } else if t1 < t2 {
+                    t1
+                } else {
+                    t2
+                };
+
+                return (true, Some((a_dir * t) + a_off));
+            }
             // ShapeType::Plane => {
             //     let other_shape_data = other.get_shape_data();
             //     let b_off = Matrix::from([[
