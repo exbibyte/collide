@@ -2,6 +2,7 @@ pub use lightmatrix;
 
 pub mod bound;
 pub mod bound_aabb;
+pub mod intersect_gjk;
 pub mod line;
 pub mod plane;
 pub mod point;
