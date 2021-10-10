@@ -46,12 +46,12 @@ where
         let ac = c - a;
         let ab_normal = ac.cross(&ab).cross(&ab);
         let ac_normal = ab.cross(&ac).cross(&ac);
-        if ab_normal.inner(&ao) > T::zero() {
+        if ab_normal.inner(&ao) >= T::zero() {
             //remove c and set new direction to ab_normal
             let simplex_new = vec![simplex[1], simplex[2]];
             *simplex = simplex_new;
             *support = ab_normal.clone();
-        } else if ac_normal.inner(&ao) > T::zero() {
+        } else if ac_normal.inner(&ao) >= T::zero() {
             //remove b and set new direction to ac_normal
             let simplex_new = vec![simplex[0], simplex[2]];
             *simplex = simplex_new.clone();
@@ -65,7 +65,7 @@ where
         //set direction towards minkowski origin
         let b = simplex[0];
         let ab = b - a;
-        let ab_normal = ab.cross(&ao).cross(&ao);
+        let ab_normal = ab.cross(&ao).cross(&ab);
         if ab_normal.norm_l2() == T::zero() {
             return true;
         } else {
@@ -182,7 +182,7 @@ fn test_intersect_gjk_query_intersect_positive_2() {
 #[test]
 fn test_intersect_gjk_query_intersect_positive_3() {
     use crate::sphere::*;
-    let a = Sphere::init(&[0f64, -5f64, 0f64], 5f64);
+    let a = Sphere::init(&[0f64, -4.999f64, 0f64], 5f64);
     let b = Sphere::init(&[0f64, 5f64, 0f64], 5f64);
     let ret = query_intersect(&a, &b);
     assert!(ret.expect("gjk return unexpected"));
@@ -208,6 +208,14 @@ fn test_intersect_gjk_query_intersect_negative_1() {
     use crate::sphere::*;
     let a = Sphere::init(&[0f64, 5f64, 0f64], 5f64);
     let b = Sphere::init(&[0f64, 0f64, 10f64], 2f64);
+    let ret = query_intersect(&a, &b);
+    assert!(!ret.expect("gjk return unexpected"));
+}
+#[test]
+fn test_intersect_gjk_query_intersect_negative_2() {
+    use crate::sphere::*;
+    let a = Sphere::init(&[0f64, -5f64, 0f64], 5f64);
+    let b = Sphere::init(&[0f64, 5f64, 0f64], 5f64);
     let ret = query_intersect(&a, &b);
     assert!(!ret.expect("gjk return unexpected"));
 }
